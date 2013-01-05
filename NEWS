@@ -1,3 +1,3 @@
+0.0-3 Added sig_report.
 0.0-2 Added pkg2env; pattern arg for write_sigs.
-
 0.0-1 First version, include sig, toString.sig, print.sig, write_sigs.

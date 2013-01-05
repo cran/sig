@@ -30,7 +30,7 @@
 #' write_sigs(e, tmpf[3])
 #' \dontrun{
 #' shell(tmpf[3], wait = FALSE)
-#' }
+#' }              
 #' @export
 write_sigs <- function(envir, file, pattern = NULL, ...)
 {
