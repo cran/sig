@@ -1,0 +1,19 @@
+\name{source_to_new_env}
+\alias{source_to_new_env}
+\title{Source a file into a new environment.}
+\usage{
+  source_to_new_env(file, encoding = getOption("encoding"))
+}
+\arguments{
+  \item{file}{a file to source.}
+
+  \item{encoding}{character encoding of that file.}
+}
+\value{
+  An environment containing the sourced variables.
+}
+\description{
+  Silently sources a file into a new environment, returning
+  that environment.
+}
+

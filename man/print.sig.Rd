@@ -10,7 +10,7 @@
     exdent = nchar(x$name), ...)
 }
 \arguments{
-  \item{x}{An object of class sig.}
+  \item{x}{An object of class \code{sig}.}
 
   \item{width}{Width of string to display.}
 
@@ -22,16 +22,17 @@
 \value{
   \code{toString} creates a string representation of a
   function signature. \code{print} is mostly invoked for
-  the side effect of printing a function
-  signature,invisibly returning its input.
+  the side effect of printing a function signature,
+  invisibly returning its input.
 }
 \description{
   Prints a function signature object.
 }
 \examples{
-spd <- sig(print.default)
-print(spd)
-print(spd, width = 40)
-print(spd, width = 40, exdent = 2)
+print_default_sig <- sig(print.default)
+print(print_default_sig)
+print(print_default_sig, width = 40)
+print(print_default_sig, width = 40, exdent = 2)
+toString(print_default_sig)
 }
 

@@ -1,3 +1,7 @@
+0.0-4 Separated listing and writing of sigs in to list_sigs/write_sigs.
+      write_sigs now defaults to writing to stdout.
+      Operators' and assignment fns' sigs wrapped in backquotes.
+      Added siglist indexing.
 0.0-3 Added sig_report.
 0.0-2 Added pkg2env; pattern arg for write_sigs.
 0.0-1 First version, include sig, toString.sig, print.sig, write_sigs.

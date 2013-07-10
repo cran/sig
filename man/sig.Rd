@@ -20,6 +20,10 @@
 }
 \note{
   Anonymous functions are given the name "..anonymous..".
+
+  Nonstandard names ("foo bar"), assignment fns ("foo<-"),
+  operators ("%foo%") and reserved names ("repeat") are
+  wrapped in backquotes.
 }
 \examples{
 sig(R.Version)               #no args
@@ -33,7 +37,7 @@ lapply(fn_list, sig)         #names are a mess
 mapply(                      #use mapply for lists
   sig,
   fn_list,
-  names(fn_list),
+  names(fn_list),            #mapply mangles names, so override
   SIMPLIFY = FALSE
 )
 }

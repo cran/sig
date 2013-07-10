@@ -17,4 +17,7 @@
 \examples{
 pkg2env(graphics)
 }
+\seealso{
+  \code{\link[base]{list2env}}
+}
 

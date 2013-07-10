@@ -1,5 +1,5 @@
 \name{sig_report}
-\alias{print.sig.report}
+\alias{print.sigreport}
 \alias{sig_report}
 \alias{sig_report.character}
 \alias{sig_report.default}
@@ -15,7 +15,7 @@
 
   \method{sig_report}{character} (x, ...)
 
-  \method{print}{sig.report} (x, ...)
+  \method{print}{sigreport} (x, ...)
 }
 \arguments{
   \item{x}{A path to an R file or an environment.}
@@ -29,7 +29,7 @@
   \item{...}{Passed to \code{sig_report.environment}.}
 }
 \value{
-  An object of class ``sig.report'' with the elements.
+  An object of class ``sigreport'' with the elements.
   \itemize{ \item{n_vars}{Number of variables.}
   \item{n_fns}{Number of functions.} \item{n_args}{Table of
   the number of args of each function.}
@@ -57,7 +57,7 @@
 }
 \examples{
 #Summarise function complexity in an environment
-sig_report(as.environment("package:stats"))
+sig_report(pkg2env(stats))
 #Summarise function complexity in a file
 \dontrun{
 tmp <- tempfile(fileext = ".R")
@@ -67,7 +67,7 @@ sig_report(tmp)
 # Adjust the cutoff for reporting
 sig_report(
   baseenv(),
-  too_many_args = 20,
+  too_many_args  = 20,
   too_many_lines = 100
 )
 }

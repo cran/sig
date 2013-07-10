@@ -1,48 +1,64 @@
 \name{write_sigs}
 \alias{write_sigs}
+\alias{write_sigs.character}
+\alias{write_sigs.default}
+\alias{write_sigs.environment}
+\alias{write_sigs.siglist}
 \title{Write sigs to file}
 \usage{
-  write_sigs(envir, file, pattern = NULL, ...)
+  write_sigs(x, file = stdout(), ...)
+
+  \method{write_sigs}{default} (x, file = stdout(), ...)
+
+  \method{write_sigs}{siglist} (x, file = stdout(), ...)
+
+  \method{write_sigs}{environment} (x, file = stdout(),
+    ...)
+
+  \method{write_sigs}{character} (x, file = stdout(), ...)
 }
 \arguments{
-  \item{envir}{An environment containing functions.}
+  \item{x}{A list of function signatures.  See details.}
 
-  \item{file}{A file to write the output to.}
+  \item{file}{A file path or connection to write the output
+  to (stdout by default).}
 
-  \item{pattern}{If not \code{NULL}, a regular expression
-  to filter the function names by.}
-
-  \item{...}{passed to \code{toString.sig}.}
+  \item{...}{passed to \code{toString.siglist}.}
 }
 \value{
-  Nothing of interest.  Invoked for the side effect of
-  writing function signatures to a file.
+  A character vector of the lines that were written to file
+  is invisibly returned.  Mostly invoked for the side
+  effect of writing function signatures to a file.
 }
 \description{
-  Writes function signatures to a text file.
+  Writes a list of function signatures to a file.
+}
+\details{
+  Where \code{x} is an object of class |code{siglist}, the
+  function essentially calls
+  \code{writeLines(tostring(x))}. If the input is a single
+  function signature (of class \code{sig}), then it is
+  coerced into a \code{siglist}.  If the input is an
+  environment or path to a file, then \code{list_sigs} is
+  called on the input before writing.
 }
 \examples{
-#From a package
-tmpf <- tempfile(LETTERS[1:3], fileext = ".R")
-on.exit(unlink(tmpf))
-write_sigs(pkg2env(graphics), tmpf[1])
+#Step by step:
+#First, list some sigs.
+utils_sigs <- list_sigs(pkg2env(utils))
+#Without a file argument, sigs are just printed to the console.
+head(write_sigs(utils_sigs))
+#Write to a file
+tmpf <- tempfile("sig", fileext = ".R")
+write_sigs(utils_sigs, tmpf)
 \dontrun{
-shell(tmpf[1], wait = FALSE)
+Open the file we've just written
+shell(tmpf, wait = FALSE)
 }
-#Just functions beginning with 'a'.
-write_sigs(pkg2env(graphics), tmpf[2], pattern = "^a")
-\dontrun{
-shell(tmpf[2], wait = FALSE)
-}
-#From a file
-e <- new.env()
-sys.source(
-  system.file("extdata", "sample.R", package = "sig"),
-  envir = e
-)
-write_sigs(e, tmpf[3])
-\dontrun{
-shell(tmpf[3], wait = FALSE)
-}
+#Can also list and write in one line.
+tmpf2 <- tempfile("sig", fileext = ".R")
+write_sigs(pkg2env(grDevices), tmpf2)
+#Single sigs are coerced to siglists
+write_sigs(sig(stats::var))
 }
 

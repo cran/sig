@@ -3,13 +3,18 @@
 #' Generates a signature object for a function.
 #' 
 #' @param fn A function.
-#' @param name_override Override the default function name.  See examples.
+#' @param name_override Override the default function name.  
+#' See examples.
 #' @return A list, with the elements
 #' \itemize{
 #'   \item{name}{The name of the function.}
 #'   \item{args}{The arguments of the function.}
 #' }
 #' @note Anonymous functions are given the name "..anonymous..". 
+#' 
+#' Nonstandard names ("foo bar"), assignment fns ("foo<-"),
+#' operators ("%foo%") and reserved names ("repeat") are wrapped
+#' in backquotes.
 #' @examples
 #' sig(R.Version)               #no args
 #' sig(scan)                    #lots of args
@@ -22,7 +27,7 @@
 #' mapply(                      #use mapply for lists
 #'   sig, 
 #'   fn_list, 
-#'   names(fn_list), 
+#'   names(fn_list),            #mapply mangles names, so override
 #'   SIMPLIFY = FALSE
 #' )            
 #' @export
@@ -37,18 +42,15 @@ sig <- function(fn, name_override)
     fn_name <- name_override[1]
   } else
   {
-    fn_name <- deparse(substitute(fn))
-    if(grepl("^function", fn_name[1]))
-    {
-      fn_name <- "..anonymous.."
-    }
+    fn_name <- deparse(substitute(fn))[1]
+    fn_name <- fix_fn_names(fn_name)
   }
   structure(
     list(
       name = fn_name,
       args = as.list(formals(fn))
     ),
-    class = "sig"
+    class = c("sig", "list")
   )
 }
 
@@ -86,22 +88,24 @@ toString.sig <- function(x, width = getOption("width"), exdent = nchar(x$name), 
 #' Prints a function signature object.
 #' 
 #' @method print sig
-#' @param x An object of class sig.
+#' @param x An object of class \code{sig}.
 #' @param width Width of string to display.
-#' @param exdent Non-negative integer specifying the indentation of subsequent lines
-#' in the string.
+#' @param exdent Non-negative integer specifying the indentation 
+#' of subsequent lines in the string.
 #' @param ... Passed to \code{toString}
-#' @return \code{toString} creates a string representation of a function signature. 
-#' \code{print} is mostly invoked for the side effect of printing a function 
-#' signature,invisibly returning its input.
+#' @return \code{toString} creates a string representation of a
+#' function signature. 
+#' \code{print} is mostly invoked for the side effect of printing 
+#' a function 
+#' signature, invisibly returning its input.
 #' @examples
-#' spd <- sig(print.default)
-#' print(spd)
-#' print(spd, width = 40)
-#' print(spd, width = 40, exdent = 2)
+#' print_default_sig <- sig(print.default)
+#' print(print_default_sig)
+#' print(print_default_sig, width = 40)
+#' print(print_default_sig, width = 40, exdent = 2)
+#' toString(print_default_sig)
 #' @export
 print.sig <- function(x, width = getOption("width"), exdent = nchar(x$name), ...)
 {
-  cat(toString(x, ...), sep = "\n")
-  invisible(x)
+  print_engine(x, width, exdent, ...)
 }
