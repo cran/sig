@@ -1,3 +1,4 @@
+0.0-5 Now works for primitives.
 0.0-4 Separated listing and writing of sigs in to list_sigs/write_sigs.
       write_sigs now defaults to writing to stdout.
       Operators' and assignment fns' sigs wrapped in backquotes.

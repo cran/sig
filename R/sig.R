@@ -19,16 +19,16 @@
 #' sig(R.Version)               #no args
 #' sig(scan)                    #lots of args
 #' sig(function(x, y) {x + y})  #anonymous
+#' sig(sum)                     #primitive
 #' fn_list <- list(
 #'   mean = mean, 
 #'   var = var
 #' )
 #' lapply(fn_list, sig)         #names are a mess
-#' mapply(                      #use mapply for lists
+#' Map(                         #use Map for lists
 #'   sig, 
 #'   fn_list, 
-#'   names(fn_list),            #mapply mangles names, so override
-#'   SIMPLIFY = FALSE
+#'   names(fn_list)             #Map mangles names, so override
 #' )            
 #' @export
 sig <- function(fn, name_override)
@@ -44,6 +44,11 @@ sig <- function(fn, name_override)
   {
     fn_name <- deparse(substitute(fn))[1]
     fn_name <- fix_fn_names(fn_name)
+  }
+  # formals returns NULL for primitive functions. Need to use formals(args(fn)).
+  if(is.primitive(fn))
+  {
+    fn <- args(fn)
   }
   structure(
     list(

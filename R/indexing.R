@@ -41,7 +41,6 @@
 
 #' @rdname Extract.siglist
 #' @method [<- siglist
-#' @usage \method{[}{siglist} (x, ...) <- value
 #' @export
 `[<-.siglist` <- function(x, ..., value)
 {
@@ -56,7 +55,6 @@
 
 #' @rdname Extract.siglist
 #' @method [[<- siglist
-#' @usage \method{[[}{siglist} (x, ...) <- value
 #' @export
 `[[<-.siglist` <- function(x, ..., value)
 {
