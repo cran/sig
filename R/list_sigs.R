@@ -7,7 +7,7 @@
 #' matching pattern are returned.       
 #' @param ... Currently ignored
 #' @return An object of class \code{siglist}, which is a list
-#' of \code{sig} obejcts.  
+#' of \code{sig} objects.  
 #' @examples
 #' #From a package
 #' list_sigs(pkg2env(graphics))
@@ -24,18 +24,35 @@ list_sigs <- function(x, pattern = NULL, ...)
 #' @rdname list_sigs  
 #' @method list_sigs default
 #' @export
-list_sigs.default <- function(x, ...)
+list_sigs.default <- function(x, pattern = NULL, ...)
 {
-  x <- as.environment(x)
-  NextMethod("list_sigs")
+  x <- as.list(x)
+  list_sigs_impl(x)
 }
 
 #' @rdname list_sigs  
-#' @method list_sigs environment
-#' @export 
-list_sigs.environment <- function(x, pattern = NULL, ...)
+#' @method list_sigs sig
+#' @export
+list_sigs.sig <- function(x, pattern = NULL, ...)
 {
-  fns <- Filter(is.function, as.list(x))
+  structure(
+    list(x), 
+    names = x$name,
+    class = c("siglist", "list")
+  )
+}
+#' @rdname list_sigs  
+#' @method list_sigs character
+#' @export       
+list_sigs.character <- function(x, pattern = NULL, ...)
+{
+  e <- as.list(source_to_new_env(x))
+  list_sigs_impl(e, ...)
+}
+
+list_sigs_impl <- function(x, pattern = NULL)
+{
+  fns <- Filter(is.function, x)
   if(!is.null(pattern))
   {
     fns <- fns[grepl(pattern, names(fns))]
@@ -51,15 +68,6 @@ list_sigs.environment <- function(x, pattern = NULL, ...)
     ),
     class = c("siglist", "list")
   )
-}
-
-#' @rdname list_sigs  
-#' @method list_sigs character
-#' @export       
-list_sigs.character <- function(x, ...)
-{
-  e <- source_to_new_env(x)
-  list_sigs(e, ...)
 }
 
 #' @rdname print.siglist

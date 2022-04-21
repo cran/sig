@@ -5,6 +5,7 @@
 #' @param fn A function.
 #' @param name_override Override the default function name.  
 #' See examples.
+#' @param ... For possible additional future arguments, currently unused.
 #' @return A list, with the elements
 #' \itemize{
 #'   \item{name}{The name of the function.}
@@ -20,6 +21,14 @@
 #' sig(scan)                    #lots of args
 #' sig(function(x, y) {x + y})  #anonymous
 #' sig(sum)                     #primitive
+#' 
+#' sig("sd")                   #string input
+#' sig("function(x, y) {x + y}")
+#' sig(~ prod)                 #formula input
+#' sig(~ function(x, y) {x + y})
+#' sig(quote(paste0))          #name input
+#' sig(quote(function(x, y) {x + y}))
+#' 
 #' fn_list <- list(
 #'   mean = mean, 
 #'   var = var
@@ -31,7 +40,67 @@
 #'   names(fn_list)             #Map mangles names, so override
 #' )            
 #' @export
-sig <- function(fn, name_override)
+sig <- function(fn, name_override, ...) 
+{
+  UseMethod("sig")
+}
+
+#' @rdname sig  
+#' @method sig default
+#' @export
+sig.default <- function(fn, ...)
+{
+  sig_impl(fn, ...)
+}
+
+#' @rdname sig  
+#' @method sig character
+#' @export
+sig.character <- function(fn, ...)
+{
+  name_override <- fn
+  fn <- try(get(fn, mode = "function"))
+  if(inherits(fn, "try-error"))
+  {
+    # Anon fn in a string
+    fn <- eval(parse(text = name_override))
+    name_override <- "..anonymous"
+  }
+  
+  sig_impl(fn, name_override)
+}
+
+#' @rdname sig  
+#' @method sig call
+#' @export
+sig.call <- function(fn, ...)
+{
+  # Probably anon fn in formula or quote
+  fn <- eval(fn)
+  name_override <- "..anonymous.."
+  sig(fn, name_override)
+}
+
+#' @rdname sig  
+#' @method sig formula
+#' @export
+sig.formula <- function(fn, ...)
+{
+  fn <- as.list(fn)[[2]]
+  sig(fn, ...)
+}
+
+#' @rdname sig  
+#' @method sig name
+#' @export
+sig.name <- function(fn, ...)
+{
+  name_override <- deparse(fn)
+  fn <- get(name_override, mode = "function")
+  sig_impl(fn, name_override)
+}
+
+sig_impl <- function(fn, name_override)
 {
   if(!is.function(fn))
   {

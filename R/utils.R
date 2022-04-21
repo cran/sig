@@ -7,23 +7,64 @@
 #' @return the environment corresponding to \code{pkg}.
 #' @seealso \code{\link[base]{list2env}}
 #' @examples
+#' # Non-standard evaluation version
 #' pkg2env(graphics)
+#' 
+#' # Standard evaluations versions
+#' pkg2env_("tools")
+#' pkg2env_(~ utils)
+#' pkg2env_(quote(stats))
 #' @export
 pkg2env <- function(pkg) 
 {
-  pkg_name <- deparse(substitute(pkg))
-  if(!pkg_name %in% .packages())
+  pkg <- deparse(substitute(pkg))
+  pkg2env_impl(pkg)
+}
+
+#' @rdname pkg2env
+#' @export
+pkg2env_ <- function(pkg)
+{
+  UseMethod("pkg2env_")
+}
+
+#' @method pkg2env_ character
+#' @export
+pkg2env_.character <- function(pkg)
+{
+  pkg2env_impl(pkg)
+}
+
+#' @method pkg2env_ formula
+#' @export
+pkg2env_.formula <- function(pkg)
+{
+  pkg <- as.character(pkg)[2]
+  pkg2env_impl(pkg)
+}
+
+#' @method pkg2env_ name
+#' @export
+pkg2env_.name <- function(pkg)
+{
+  pkg <- deparse(pkg)
+  pkg2env_impl(pkg)
+}
+
+pkg2env_impl <- function(pkg)
+{
+  if(!pkg %in% .packages())
   {
-    if(pkg_name %in% .packages(TRUE))
+    if(pkg %in% .packages(TRUE))
     {
-      message("Loading package ", sQuote(pkg_name), ".")
-      library(pkg_name, character.only = TRUE)
+      message("Loading package ", sQuote(pkg), ".")
+      library(pkg, character.only = TRUE)
     } else
     {
-      stop("The package ", sQuote(pkg_name), " is not available.")
+      stop("The package ", sQuote(pkg), " is not available.")
     }
   }
-  as.environment(paste0("package:", pkg_name))
+  as.environment(paste0("package:", pkg))  
 }
 
 #' Source a file into a new environment.

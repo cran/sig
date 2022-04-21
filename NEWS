@@ -1,3 +1,4 @@
+0.0-6 sig is now generic and works for character, formula and name input.
 0.0-5 Now works for primitives.
 0.0-4 Separated listing and writing of sigs in to list_sigs/write_sigs.
       write_sigs now defaults to writing to stdout.

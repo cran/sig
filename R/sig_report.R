@@ -3,8 +3,9 @@
 #' @param x A path to an R file or an environment.
 #' @param too_many_args Upper bound for a sensible number of args.
 #' @param too_many_lines Upper bound for a sensible number of lines.
+#' @param length_metric Either \code{"deparse"} or \code{"body"}.  See note.
 #' @param ... Passed to \code{sig_report.environment}.
-#' @return An object of class ``sigreport'' with the elements.
+#' @return An object of class ``sigreport'' with the elements:
 #' \itemize{
 #'   \item{n_vars}{Number of variables.}
 #'   \item{n_fns}{Number of functions.}                            
@@ -24,22 +25,28 @@
 #' If the input is a path to an R file, then that file is sourced into 
 #' a new environment and and the report is generated from that.
 #' The number of lines of code that a function takes up is subjective 
-#' in R; this function uses \code{length(deparse(fn))}. 
+#' in R; this function gives you a choice of \code{length(deparse(fn))} or
+#' \code{length(body(fn))}, depending upon the value of \code{length_metric}. 
+#' The \code{body} metric tends to give smaller values than \code{deparse}, so 
+#' you may want to reduce the \code{too_many_lines} argument.
 #' @examples
-#' #Summarise function complexity in an environment
+#' #Summarize function complexity in an environment
 #' sig_report(pkg2env(stats))    
-#' #Summarise function complexity in a file
-#' \dontrun{
+#' #Summarize function complexity in a file
+#' \donttest{
+#' # From a file
 #' tmp <- tempfile(fileext = ".R")
-#' writeLines(c(toString(sig(scan)), deparse(body(scan))), tmp)
+#' dump("scan", tmp)
 #' sig_report(tmp)
 #' }   
-#' # Adjust the cutoff for reporting
+#' # From an environment, adjusting the cutoff for reporting
 #' sig_report(              
 #'   baseenv(),  
 #'   too_many_args  = 20,    
 #'   too_many_lines = 100
-#' )                
+#' )      
+#' # Alternate length metric          
+#' sig_report(baseenv(), length_metric = "body")
 #' @export
 sig_report <- function(x, ...)
 {
@@ -58,8 +65,10 @@ sig_report.default <- function(x, ...)
 #' @rdname sig_report            
 #' @method sig_report environment
 #' @export
-sig_report.environment <- function(x, too_many_args = 10, too_many_lines = 50, ...)
+sig_report.environment <- function(x, too_many_args = 10, too_many_lines = 50, 
+  length_metric = c("deparse", "body"), ...)
 {
+  length_metric <- match.fun(match.arg(length_metric))
   all_vars <- mget(ls(envir = x, all.names = TRUE), envir = x)
   all_fns <- Filter(is.function, all_vars)
   n_args <- vapply(
@@ -69,7 +78,7 @@ sig_report.environment <- function(x, too_many_args = 10, too_many_lines = 50, .
   )
   n_lines <- vapply(
     all_fns,
-    function(fn) length(deparse(fn)),
+    function(fn) length(length_metric(fn)),
     integer(1)    
   )
   

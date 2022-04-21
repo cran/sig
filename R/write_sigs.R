@@ -9,8 +9,8 @@
 #' @return A character vector of the lines that were written to file is
 #' invisibly returned.  Mostly invoked for the side effect of writing 
 #' function signatures to a file.
-#' @details Where \code{x} is an object of class |code{siglist}, the
-#' function essentially calls \code{writeLines(tostring(x))}.
+#' @details Where \code{x} is an object of class \code{siglist}, the
+#' function essentially calls \code{writeLines(tostring(x)}.
 #' If the input  is a single function signature (of class \code{sig}), 
 #' then it is coerced into a \code{siglist}.  If the input is an  
 #' environment or path to a file, then \code{list_sigs} is called on 
@@ -24,15 +24,13 @@
 #' #Write to a file
 #' tmpf <- tempfile("sig", fileext = ".R")
 #' write_sigs(utils_sigs, tmpf)    
-#' \dontrun{
-#' Open the file we've just written
-#' shell(tmpf, wait = FALSE)
-#' }   
+#' #Open the file we've just written
+#' readLines(tmpf, n = 6)
 #' #Can also list and write in one line.
 #' tmpf2 <- tempfile("sig", fileext = ".R") 
 #' write_sigs(pkg2env(grDevices), tmpf2)
 #' #Single sigs are coerced to siglists
-#' write_sigs(sig(stats::var))           
+#' write_sigs(sig(stats::var))  
 #' @export
 write_sigs <- function(x, file = stdout(), ...)
 {
@@ -63,7 +61,16 @@ write_sigs.siglist <- function(x, file = stdout(), ...)
 #  x <- as.siglist(x, ...)
 #  NextMethod("write_sigs")
 #}
-                                   
+
+#' @rdname write_sigs
+#' @method write_sigs list
+#' @export
+write_sigs.list <- function(x, file = stdout(), ...)
+{
+  sig_list <- list_sigs(x, ...)
+  write_sigs(sig_list, file = file, ...)
+}
+
 #' @rdname write_sigs
 #' @method write_sigs environment
 #' @export
